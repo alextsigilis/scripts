@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+VENV_ROOT="$HOME/.venvs"
+
+if [ ! -d "$VENV_ROOT" ]; then
+  echo "❌ Directory not found: $VENV_ROOT"
+  return 1
+fi
+
+# Find venvs by looking for bin/activate
+VENV_PATH=$(
+  find "$VENV_ROOT" -maxdepth 3 -type f -name activate 2>/dev/null \
+  | sed 's|/bin/activate$||' \
+  | fzf --prompt="Select virtualenv: "
+)
+
+# If user cancels fzf
+if [ -z "$VENV_PATH" ]; then
+  echo "❌ No virtual environment selected"
+  return 1
+fi
+
+# Activate selected venv
+source "$VENV_PATH/bin/activate"
+
+echo "✅ Activated venv:"
+echo "   $VENV_PATH"
+python --version
